@@ -1,63 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For Honey 💖</title>
+<title>For Honey ❤️</title>
 
 <style>
-body {
-    margin: 0;
-    padding: 0;
+body{
+    margin:0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom right, #ffc0cb, #ffe6f0);
-    text-align: center;
+    text-align:center;
+    background: linear-gradient(to right, #ff758c, #ff7eb3);
+    color:white;
+    overflow:hidden;
 }
 
-.container {
-    padding: 30px 20px;
+/* Main section */
+.container{
+    padding:40px 20px;
 }
 
-h1 {
-    color: #e60073;
-    font-size: 28px;
+h1{
+    font-size:28px;
 }
 
-button {
-    padding: 12px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    margin: 10px;
+/* Buttons */
+button{
+    padding:12px 20px;
+    margin:10px;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    cursor:pointer;
 }
 
-.yes-btn {
-    background-color: #ff4d88;
-    color: white;
+.yes{
+    background:#ff2d55;
+    color:white;
 }
 
-.no-btn {
-    background-color: #cccccc;
+.no{
+    background:#ffffff;
+    color:#ff2d55;
 }
 
-.image-container {
-    margin-top: 25px;
-    display: none;
+/* Success screen */
+#success{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
 }
 
-.image-container img {
-    width: 90%;
-    max-width: 350px;
-    border-radius: 20px;
-    box-shadow: 0px 5px 20px rgba(0,0,0,0.3);
+/* Canvas fireworks */
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
 }
 
-.success-message {
-    display: none;
-    color: #cc0066;
-    font-size: 20px;
-    margin-top: 15px;
+/* Message */
+.message{
+    position:absolute;
+    top:10%;
+    width:100%;
+    font-size:26px;
+    font-weight:bold;
+    z-index:2;
+}
+
+/* Photo */
+.photo{
+    position:absolute;
+    top:55%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    width:80%;
+    max-width:350px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(255,255,255,0.8);
+    z-index:2;
+}
+
+@media(max-width:600px){
+    h1{font-size:22px;}
 }
 </style>
 </head>
@@ -65,47 +93,106 @@ button {
 <body>
 
 <div class="container">
-    <h1>Honey ❤️<br>Will you be my Valentine? 💖</h1>
+    <h1>Happy Valentine's Day Honey 💖</h1>
+    <h2>Will you be mine forever? 💘</h2>
 
-    <button class="yes-btn" onclick="sayYes()">Yes 💕</button>
-    <button class="no-btn" onclick="sayNo()">No please honey 😏</button>
+    <button class="yes" onclick="yesClicked()">Yes ❤️</button>
+    <button class="no" onclick="noClicked()">No please honey 😅</button>
+</div>
 
-    <div class="image-container" id="imageBox">
-        <img src="honey.img.jpeg" alt="Honey">
-    </div>
-
-    <div class="success-message" id="successText">
-        Yay! 💕 I knew you'd say yes! 💖
-    </div>
+<div id="success">
+    <canvas id="fireworks"></canvas>
+    <div class="message">Yay! I knew you'd say yes! 💕</div>
+    <img src="honey.jpg" class="photo">
 </div>
 
 <script>
-let messages = [
-    "Try again, please honey 😌",
-    "Are you sure? 😏",
-    "No escape! 💘",
-    "You can't escape love 💞",
-    "Keep trying 😉",
-    "Seriously? 🤨",
-    "Still no? Really? 😂",
-    "Please honey 🥺"
+
+function yesClicked(){
+    document.getElementById("success").style.display = "block";
+    startFireworks();
+}
+
+/* 🔥 FIREWORKS CODE */
+
+function startFireworks(){
+
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+function createFirework(){
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height/2;
+
+    for(let i=0;i<80;i++){
+        particles.push({
+            x:x,
+            y:y,
+            angle:Math.random()*2*Math.PI,
+            speed:Math.random()*5+2,
+            radius:2,
+            alpha:1
+        });
+    }
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach((p,i)=>{
+        p.x += Math.cos(p.angle)*p.speed;
+        p.y += Math.sin(p.angle)*p.speed;
+        p.alpha -= 0.01;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fillStyle = "rgba("+
+            Math.floor(Math.random()*255)+","+
+            Math.floor(Math.random()*255)+","+
+            Math.floor(Math.random()*255)+","+p.alpha+")";
+        ctx.fill();
+
+        if(p.alpha<=0){
+            particles.splice(i,1);
+        }
+    });
+
+    if(Math.random()<0.05){
+        createFirework();
+    }
+}
+
+animate();
+}
+
+/* NO button infinite */
+
+let noMessages = [
+"Seriously? 🤨",
+"Try again please honey 😘",
+"No escape 😎",
+"Are you sure honey? 😜",
+"You can’t say no 😏"
 ];
 
 let index = 0;
 
-function sayYes() {
-    document.getElementById("imageBox").style.display = "block";
-    document.getElementById("successText").style.display = "block";
-}
-
-function sayNo() {
-    const noBtn = document.querySelector(".no-btn");
-
-    noBtn.innerText = messages[index];
+function noClicked(){
+    alert(noMessages[index]);
     index++;
-
-    if (index >= messages.length) {
-        index = 0; // 🔁 Infinite loop
+    if(index >= noMessages.length){
+        index = 0;
     }
 }
+
 </script>
+
+</body>
+</html>
